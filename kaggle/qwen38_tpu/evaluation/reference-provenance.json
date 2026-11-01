@@ -1,0 +1,12 @@
+{
+  "pair_review_reference.py": {
+    "source": "private development source; frozen parser included here",
+    "sha256": "77b074d596b859d2230fd507a178f177350e515f7ef29c45205963e8eb97201d",
+    "copied_verbatim": true
+  },
+  "annotation_reference.py": {
+    "source": "src/data_synth/verification.py",
+    "sha256": "a83dd9301810f0d6c704e767f30e3b9a989488ba8b1d95d97c9c227d53b47e5e",
+    "copied_verbatim": true
+  }
+}

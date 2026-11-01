@@ -1,0 +1,84 @@
+{
+  "format": 1,
+  "label_scope": "visible_image_properties",
+  "label_authority": "Original visual-property checks; re-inspect and relabel your own replacement images before evaluation.",
+  "images": [
+    {
+      "name": "beamng_grid",
+      "source": "your-captures/beamng_grid.png"
+    },
+    {
+      "name": "beamng_contact",
+      "source": "your-captures/beamng_contact.png"
+    },
+    {
+      "name": "beamng_city",
+      "source": "your-captures/beamng_city.png"
+    },
+    {
+      "name": "beamng_roadside",
+      "source": "your-captures/beamng_roadside.png"
+    }
+  ],
+  "cases": [
+    {
+      "name": "beamng_grid_count",
+      "group": "beamng_visible_count",
+      "images": [
+        "beamng_grid"
+      ],
+      "prompt": "How many cars are visible in this image? Answer with a single number.",
+      "match": {
+        "kind": "first_int",
+        "value": 2
+      },
+      "asserted": true
+    },
+    {
+      "name": "beamng_contact_blue_side",
+      "group": "beamng_visible_position",
+      "images": [
+        "beamng_contact"
+      ],
+      "prompt": "Is the blue car to the left or the right of the red car in this image? Answer with one word.",
+      "match": {
+        "kind": "contains_all",
+        "words": [
+          "left"
+        ],
+        "absent": [
+          "right"
+        ]
+      },
+      "asserted": true
+    },
+    {
+      "name": "beamng_city_road_text",
+      "group": "beamng_visible_text",
+      "images": [
+        "beamng_city"
+      ],
+      "prompt": "What uppercase word is painted on the road near the crosswalk? Answer with the word only.",
+      "match": {
+        "kind": "contains_all",
+        "words": [
+          "stop"
+        ]
+      },
+      "asserted": true
+    },
+    {
+      "name": "beamng_roadside_count",
+      "group": "beamng_visible_count",
+      "images": [
+        "beamng_roadside"
+      ],
+      "prompt": "How many cars are visible in this image? Answer with a single number.",
+      "match": {
+        "kind": "first_int",
+        "value": 1
+      },
+      "asserted": true
+    }
+  ]
+}

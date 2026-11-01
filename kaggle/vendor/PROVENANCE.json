@@ -1,0 +1,39 @@
+{
+  "upstream": "https://github.com/ARahim3/kaggle-tpu-lab",
+  "upstream_commit": "1aa1f083ae253470d9f355fe9c3eb12003300e91",
+  "retrieved": "2026-10-02",
+  "license": "MIT",
+  "files": {
+    "__init__.py": "addaf940c117c1f387a08a14cfe971894e404574120853bd2d3b9861ff1cf2a9",
+    "basestore.py": "3f0a253c66d848fb59fde0e2a7ef8b46e13bf64d8438a65501fe13c09b035b7d",
+    "checkpoint.py": "1dc05a1e8678161c3f8707c7216cb0afc969b3239cb67c41a15ef7b4acd46e68",
+    "data/iq_grids.npz": "4358de7d4ed7a7294bb95d802b161c86ce5622c5c66a7653402f8db03bcb9a23",
+    "engine.py": "4887a3013450f705e7795e2ade2b517ae1802c9568bd9b77dc7e5cb635b106a0",
+    "gguf_reader.py": "c7d936f690938c09e388de7e6ae617221d2abe385b1075352092b907264ec2b7",
+    "hf_convert.py": "c938145263701294271bad8d2639610a2d63a9fa72fc0733ee80d7f5d2e53a8b",
+    "iq_grids_data.py": "929e75e4602d646fef0626c250779c83a9a073377e5a0ca0ca5f81b0dd3689e6",
+    "iqquant.py": "85ef37e11db861c459a4793f72db64f63fcbc357b6a8f09f3e322b38ce506149",
+    "model.py": "96476fbe0850c248bfcc76d325e825bb81a2b3f8aa546522e2a0640f737284d2",
+    "pallas_moe.py": "cbb5235d359d81d9df7bff0543f5d4d18713fd4fef709718030b56f5cc57a585",
+    "planes.py": "f7550e77ccbab178ce9f519d19200e5b6b37af97568d0066cda92adb2e00ac36",
+    "quant8.py": "944227170cf99b0d21d96d69002809861d80e8a62dab031a7ecf2f5e50b9f2a1",
+    "resident.py": "c9025d04722e02469e7f21b4f670a845cfb948cefd535f7fe64d3814f366e6c1",
+    "routing_plan.py": "5b73ed95c5dd3c0a1d01ea59001091032f0a2c86a089526bfe29ac89bd3deb7a",
+    "scheduler.py": "aaa98ef4d511fab86ab6ce0180f84ba506c73ed416f63e197d3ea862d3203c28",
+    "vision.py": "ac4afbaef77e8cb40074c881cbd2003169494dbff3c0d61a53d6c7320b9d0229"
+  },
+  "local_changes_2026_10_03": {
+    "model.py": "Mask padded latent-cache writes using absolute scatter positions; avoids clamped overwrites at context capacity.",
+    "pruned_modules": [
+      "basestore.py",
+      "hf_convert.py",
+      "iq_grids_data.py",
+      "iqquant.py",
+      "pallas_moe.py",
+      "planes.py",
+      "resident.py",
+      "routing_plan.py",
+      "scheduler.py"
+    ]
+  }
+}

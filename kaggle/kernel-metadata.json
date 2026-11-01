@@ -1,0 +1,20 @@
+{
+  "id": "your-kaggle-username/glm53-tpu-trial",
+  "title": "GLM 5.3 Q4 Q6 VISION",
+  "code_file": "glm53-flash-ram-offload.ipynb",
+  "language": "python",
+  "kernel_type": "notebook",
+  "is_private": true,
+  "enable_gpu": false,
+  "enable_tpu": true,
+  "enable_internet": true,
+  "machine_shape": "TpuV5E8",
+  "docker_image": "gcr.io/kaggle-private-byod/python-tpuvm@sha256:a2111cb9be558ea4bc187754bb95d7b65e90d8259434f1eb0e0ab1193ff498c0",
+  "docker_image_pinning_type": "original",
+  "dataset_sources": [
+    "your-kaggle-username/glm53-engine"
+  ],
+  "competition_sources": [],
+  "kernel_sources": [],
+  "model_sources": []
+}

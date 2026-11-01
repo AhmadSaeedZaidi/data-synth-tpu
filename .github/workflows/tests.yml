@@ -1,0 +1,36 @@
+name: offline checks
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  application:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: python -m pip install -c requirements-dev.lock -e '.[dev,models,hf,beamng]'
+      - run: ruff check .
+      - run: ruff format --check .
+      - run: pytest tests -q
+      - run: python scripts/publish_kaggle_notebook.py --check-repo
+      - run: python -m build
+  jax-cpu:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      JAX_PLATFORMS: cpu
+      XLA_FLAGS: --xla_force_host_platform_device_count=8
+      OPENBLAS_NUM_THREADS: '2'
+      OMP_NUM_THREADS: '2'
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: pip
+      - run: python -m pip install -e '.[dev,models,hf,tpu-test]'
+      - run: pytest kaggle/tests -q

@@ -1,0 +1,54 @@
+{
+  "fixture": "glm53_offload/data/decoder_reference.npz",
+  "reference": "gguf-py 0.19.0 dequantize",
+  "upstream": "https://github.com/ggml-org/llama.cpp/tree/master/gguf-py",
+  "generated_on": "2026-10-02",
+  "random_seed": 93,
+  "formats": [
+    "Q4_K",
+    "Q5_K",
+    "Q6_K",
+    "Q8_0",
+    "F16",
+    "BF16",
+    "F32"
+  ],
+  "method": "Finite random packed blocks; reference outputs generated independently by gguf-py. Runtime validates its JAX decoders against these frozen outputs before allocating expert tables.",
+  "vision_reference": {
+    "fixture": "glm53_offload/data/vision_reference.npz",
+    "sha256": "f35e9b1671bf35aeeb476fc1a20104e544668c50049caff82f18a0b28462a18e",
+    "reference": "Transformers 5.18.0 Glm5NextVisionModel, PyTorch 2.12.0+cpu, eager attention",
+    "source": "https://github.com/huggingface/transformers/blob/v5.18.0/src/transformers/models/glm5_next/modeling_glm5_next.py",
+    "generator": "scripts/build_glm53_vision_reference.py",
+    "seed": 813,
+    "dimensions": {
+      "depth": 2,
+      "hidden": 32,
+      "heads": 8,
+      "intermediate": 64,
+      "output": 32,
+      "projection_intermediate": 64
+    },
+    "grids": [
+      [
+        1,
+        4,
+        6
+      ],
+      [
+        1,
+        2,
+        4
+      ]
+    ],
+    "scope": "Independent random-weight numerical reference; not full-checkpoint image quality or BF16 text parity."
+  },
+  "text_reference": {
+    "fixture": "glm53_offload/data/text_reference.npz",
+    "sha256": "4554ba719b49802e8591192ce347f55b66ca34b242bdd570164171ec0be30768",
+    "reference": "Transformers 5.18.0 Glm5NextTextModel, PyTorch 2.12.0+cpu; eager attention and reference KDA",
+    "generator": "scripts/build_glm53_text_reference.py",
+    "seed": 719,
+    "scope": "Two random-weight layers (KDA/dense and DSA/MoE), four mHC streams, image embedding overrides across chunk boundaries, prefill and cached decode. Not full-checkpoint parity."
+  }
+}
