@@ -1,5 +1,7 @@
 # Private Kaggle publishing and monitoring
 
+[Getting started](getting-started.md) · [Experiment timeline and measured queue waits](experiments.md)
+
 Build notebooks locally and configure their metadata for your own account.
 Publish the matching runtime dataset first and use its exact version in
 `dataset_sources`. The notebook verifies the attached runtime checksum.
@@ -18,9 +20,11 @@ deletes that copy. The public source stays credential-free. Do not publish the
 private upload copy or copy its source back into Git. A returned version confirms
 submission; a queue or running state needs separate status verification.
 
-The full model trial requires online W&B and Weave readback before loading
-weights. JAX device traces, incremental JSON reports and logs preserve local
-evidence. Probe and model deadlines share one six-hour budget.
+The builder in this source snapshot requires online W&B and Weave readback
+before loading weights. Later hosted trials record startup telemetry status
+and can continue with local evidence. JAX device traces, incremental JSON
+reports and logs preserve the experiment record. Probe and model deadlines
+share one six-hour budget.
 
 `scripts/watch_kaggle_run.py --help` describes a bounded local watcher for an
 exact saved version. Provide a completion callback command of your choice. It
