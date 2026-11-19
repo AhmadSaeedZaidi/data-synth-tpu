@@ -13,6 +13,7 @@ vision, and a Q8 KV cache.
 > [Measured queue waits](docs/experiments.md#queue-wait)
 
 [Experiment timeline](docs/experiments.md) ·
+[Detailed results and run counts](docs/experiment-results.md) ·
 [Getting started](docs/getting-started.md) ·
 [Kaggle publishing and monitoring](docs/operations.md)
 

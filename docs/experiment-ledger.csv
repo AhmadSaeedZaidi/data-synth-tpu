@@ -1,0 +1,41 @@
+Notebook series,Saved version,Kaggle status,Audit date (UTC),Evidence reviewed
+Qwen3.8-Flash-Next,1,COMPLETE,2026-11-19,Application report and worker evidence
+Qwen3.8-Flash-Next,2,CANCEL_ACKNOWLEDGED,2026-11-19,Submission and version status
+Qwen3.8-Flash-Next,3,ERROR,2026-11-19,Application report and worker evidence
+Qwen3.8-Flash-Next,4,CANCEL_ACKNOWLEDGED,2026-11-19,Submission and version status
+Qwen3.8-Flash-Next,5,ERROR,2026-11-19,Application report and worker evidence
+Qwen3.8-Flash-Next,6,COMPLETE,2026-11-19,Application report and worker evidence
+Qwen3.8-Flash-Next,7,CANCEL_ACKNOWLEDGED,2026-11-19,Submission and version status
+Qwen3.8-Flash-Next,8,ERROR,2026-11-19,Notebook and worker log
+Qwen3.8-Flash-Next,9,ERROR,2026-11-19,Application report and worker evidence
+Qwen3.8-Flash-Next,10,COMPLETE,2026-11-19,Application report and worker evidence
+Qwen3.8-Flash-Next,11,COMPLETE,2026-11-19,Application report and worker evidence
+Qwen3.8-Flash-Next,12,COMPLETE,2026-11-19,Application report and worker evidence
+Qwen3.8-Flash-Next,13,ERROR,2026-11-19,Application report and worker evidence
+Qwen3.8-Flash-Next,14,COMPLETE,2026-11-19,Application report and worker evidence
+Qwen3.8-Flash-Next,15,ERROR,2026-11-19,Application report and worker evidence
+Qwen3.8-Flash-Next,16,ERROR,2026-11-19,Startup report and telemetry traceback
+Qwen3.8-Flash-Next,17,UNCONFIRMED,2026-11-19,Submission and version status
+GLM-5.3-Flash Q4/Q6,1,COMPLETE,2026-11-19,Notebook log
+GLM-5.3-Flash Q4/Q6,2,COMPLETE,2026-11-19,Notebook log
+GLM-5.3-Flash Q4/Q6,3,COMPLETE,2026-11-19,Notebook log
+GLM-5.3-Flash Q4/Q6,4,COMPLETE,2026-11-19,Notebook log
+GLM-5.3-Flash Q4/Q6,5,COMPLETE,2026-11-19,Notebook log
+GLM-5.3-Flash Q4/Q6,6,COMPLETE,2026-11-19,Notebook log
+GLM-5.3-Flash Q4/Q6,7,COMPLETE,2026-11-19,Notebook log
+GLM-5.3-Flash Q4/Q6,8,CANCEL_ACKNOWLEDGED,2026-11-19,Version status and empty output listing
+GLM-5.3-Flash Q4/Q6,9,CANCEL_ACKNOWLEDGED,2026-11-19,Version status and empty output listing
+GLM-5.3-Flash Q4/Q6,10,CANCEL_ACKNOWLEDGED,2026-11-19,Version status and empty output listing
+GLM-5.3-Flash Q4/Q6,11,CANCEL_ACKNOWLEDGED,2026-11-19,Application report and worker evidence
+GLM-5.3-Flash Q4/Q6,12,ERROR,2026-11-19,Application report and worker evidence
+GLM-5.3-Flash Q4/Q6,13,COMPLETE,2026-11-19,Application report and worker evidence
+GLM-5.3-Flash Q4/Q6,14,ERROR,2026-11-19,Application report and worker evidence
+GLM-5.3-Flash Q4/Q6,15,ERROR,2026-11-19,Application report and worker evidence
+GLM image-input gate,1,COMPLETE,2026-11-19,Notebook log and printed application result
+GLM image-input gate,2,COMPLETE,2026-11-19,Notebook log and printed application result
+BF16 rounding TPU probe,1,COMPLETE,2026-11-19,Probe report or publication receipt
+Qwen 27B image-input gate,1,COMPLETE,2026-11-19,Notebook log and printed application result
+Qwen traffic runtime gate,1,COMPLETE,2026-11-19,Notebook log and printed application result
+TPU environment probe,1,COMPLETE,2026-11-19,Notebook log and printed application result
+CPU tracking probe,1,COMPLETE,2026-11-19,Probe report or publication receipt
+CPU publisher smoke test,1,COMPLETE,2026-11-19,Probe report or publication receipt

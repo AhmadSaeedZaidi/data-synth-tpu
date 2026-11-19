@@ -1,6 +1,12 @@
 # TPU experiment timeline
 
-[Repository overview](../README.md) · [Getting started](getting-started.md)
+[Repository overview](../README.md) · [Detailed results](experiment-results.md) ·
+[Version ledger (CSV)](experiment-ledger.csv)
+
+The full audit covers **38 saved versions across seven TPU notebook series**
+and **two CPU smoke-test versions**. This page highlights milestones from that
+history. The detailed results describe what each run measured and where it
+stopped.
 
 ## Queue wait
 
@@ -34,7 +40,7 @@ than the public source snapshot.
 | Oct 28 | Qwen v13 · profiling error | All 17 numerical and routing gates passed. Calibration kept four-way expert parallelism and two-way tensor parallelism with expert groups of four. A missing output directory stopped the trial at its first decode trace. |
 | Oct 27 | Qwen v12 · evaluation completed | 46/48 assertions passed. Both misses were formatting checks. In the sampled traces, packed expert selection and decoding accounted for roughly 52–53% of covered device time. |
 | Oct 24–25 | Qwen v10–v11 · evaluation completed | Both scored 40/48 assertions. The v11 alternate KV gather passed correctness checks with a 1.005× full-read speedup, so the existing gather stayed in use. |
-| Oct 21 | Qwen v9 · active time cap | The worker was still decoding at B8 when the six-hour cap ended the run. |
+| Oct 21 | Qwen v9 · active time cap | All 31 image answers failed. The worker was still decoding at B8 when the six-hour cap ended the run. |
 | Oct 17 | Qwen v6 · evaluation completed | All nine startup gates passed with Q8 KV. All 49 cases ran and 42/48 assertions passed. |
 | Mid-Oct | Qwen v3–v5 · numerical gates | Long-context Q8 checks exposed a scale-rounding mismatch. The codec fix passed its own gate. Later gates exposed remaining FP32 and INT8 compute differences before full weight loading. |
 | Oct 12 | Qwen v1 · first full run | Ran native vision and batched Q6 inference with n-grams in RAM. Seven of eight unique cases passed across three batch sizes. The same OCR case failed at each size. |
