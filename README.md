@@ -19,20 +19,21 @@ vision, and a Q8 KV cache.
 
 ## Results so far
 
-- **Quality.** Qwen v14 and v15 passed all 48 asserted checks in the sequential
-  suite, including four schema checks. Both misread one OCR case at batch 4.
-- **Decode.** Qwen v15 measured **8.02 / 8.10 / 10.19 tokens/s** at batch
+- **Quality.** Qwen v14, v15 and v17 passed all 48 asserted sequential checks,
+  including four schema checks. The same OCR case failed at batch 4.
+- **Decode.** Qwen v17 measured **8.08 / 8.30 / 10.22 tokens/s** at batch
   **1 / 2 / 4**, respectively, across all active requests. The batch 8 memory
   check skipped allocation.
-- **Next trial.** Qwen v17 groups TorchTPU, JAX and hybrid comparisons, BF16×6
-  precision checks, and a batch-sensitive OCR diagnostic with the full model
-  evaluation. [Trial scope and status](docs/experiments.md#next-trial)
+- **TorchTPU.** Native vision and eight-rank expert/tensor parallel checks
+  passed. The timing and BF16×6 probes stopped at synchronization.
+  [Detailed v17 report](docs/qwen38-v17.md)
 
 ## Repository map
 
 | Path | Purpose |
 | --- | --- |
 | [kaggle/qwen38_tpu](kaggle/qwen38_tpu/) | JAX vision-language runtime, expert and tensor parallelism, and numerical gates |
+| [kaggle/qwen38_torch](kaggle/qwen38_torch/) | TorchTPU vision, packed expert and hybrid component experiments |
 | [kaggle/glm53_offload](kaggle/glm53_offload/) | Earlier GLM inference, expert offload, and shared monitoring |
 | [kaggle/packed_q6](kaggle/packed_q6/) | Experimental Pallas kernel and benchmarks |
 | [src/data_synth](src/data_synth/) | Traffic annotation, evidence verification, and JSONL export |

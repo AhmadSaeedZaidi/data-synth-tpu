@@ -141,6 +141,14 @@ def run_probe(command, output, directory, *, timeout, monitor=None):
     report["status"] = status or (
         "passed" if returncode == 0 and report.get("status") == "passed" else "failed"
     )
+    if report["status"] != "passed" and "error" not in report:
+        with output.with_suffix(".log").open("rb") as log:
+            log.seek(max(0, log.seek(0, 2) - 4000))
+            tail = log.read(4000).decode("utf-8", errors="replace")
+        key = os.environ.get("WANDB_API_KEY", "")
+        if key:
+            tail = tail.replace(key, "[REDACTED]")
+        report.update(error_type=report.get("error_type", "ProbeProcessError"), error=tail)
     report["outer_supervisor"] = dict(
         returncode=returncode, elapsed_seconds=time.monotonic() - started, timeout_seconds=timeout
     )

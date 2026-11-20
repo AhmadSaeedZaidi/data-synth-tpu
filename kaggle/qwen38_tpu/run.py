@@ -1027,6 +1027,18 @@ def main():
         )
         if not report["batch_results"]:
             raise MemoryError("No requested batch admitted by measured per-chip memory gate")
+        if config.get("batch_divergence_diagnostic"):
+            from .batch_diagnostic import diagnose
+
+            engine.release_state()
+            admission = memory.admit(4, plans[4]) if 4 in plans else {"admitted": False}
+            if admission["admitted"]:
+                report["batch_divergence"] = diagnose(
+                    engine, prompts[:8], hasher, ngrams, tokens, prefill, emit,
+                    directory / "batch-divergence.json",
+                )
+            else:
+                report["batch_divergence"] = dict(status="SKIPPED", reason="memory_admission")
         report["status"] = "PASS" if not report["quality"]["failed_cases"] else "QUALITY_FAILED"
     except BaseException as error:
         report.update(

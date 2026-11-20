@@ -149,12 +149,19 @@ def package_evidence(directory, destination, *, extra_files=(), limit_bytes=24 <
         sources += sorted((profile / "device-trace").rglob("*.gz"))[:2]
         sources += sorted((profile / "device-trace").rglob("*.pb"))[:1]
     captured, records, remaining = {}, [], limit_bytes
+    seen_sources = set()
     for path in sources:
         if not path.is_file() or path.is_symlink():
             continue
+        source = path.resolve()
+        if source in seen_sources:
+            continue
+        seen_sources.add(source)
+        # Preserve every nested experiment's namespace, including progress.json
+        # and report.json, rather than flattening them onto the model's files.
         name = (
-            path.relative_to(directory).as_posix()
-            if path.is_relative_to(directory / "profiles")
+            source.relative_to(directory.resolve()).as_posix()
+            if source.is_relative_to(directory.resolve())
             else path.name
         )
         size = path.stat().st_size

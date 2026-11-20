@@ -160,3 +160,63 @@ def require_live_tracking(monitor, config, directory):
         return proof
     finally:
         tracing.finish("TRACKING_CHECK_COMPLETE")
+
+
+def check_live_tracking(monitor, config, directory, *, timeout=20):
+    """Record independent startup readbacks for a trial that can run locally."""
+    from . import tracing
+
+    run = monitor.run
+    wandb = {"status": "UNAVAILABLE"}
+    weave = {"status": "UNAVAILABLE"}
+    project = config["wandb_project"]
+    if run is not None and monitor.state.get("mode") == "online":
+        wandb.update(run_id=run.id, url=run.url)
+        try:
+            # Use a committed numeric metric, the same path as later progress.
+            marker = int(time.time())
+            run.log({"tracking/startup_heartbeat": marker}, commit=True)
+            wait_for_remote(
+                lambda: read_wandb_summary(config["wandb_entity"], project, run.id),
+                lambda data: data["summary"].get("tracking/startup_heartbeat") == marker,
+                timeout=timeout,
+            )
+            wandb.update(status="PASS")
+        except Exception as error:
+            wandb.update(status="UNVERIFIED", error_type=type(error).__name__)
+    elif monitor.state.get("tracking_error"):
+        wandb["error_type"] = monitor.state["tracking_error"]
+
+    if config.get("weave_enabled"):
+        try:
+            tracing.configure(config, directory)
+            client, root = tracing._client, tracing._root
+            if client is None or root is None:
+                raise TrackingCheckError("Weave startup unavailable")
+            project_id = f"{client.entity}/{project}"
+            weave.update(trace_id=root.trace_id, url=f"https://wandb.ai/{project_id}/weave/calls")
+            with tracing.span("tracking_ready"):
+                bounded_call(client.flush, timeout=10)
+                wait_for_remote(
+                    lambda: read_weave_calls(project_id, root.trace_id),
+                    lambda rows: any(
+                        operation_name(c) == f"{config.get('trace_prefix', 'glm53')}.tracking_ready"
+                        and not c.get("ended_at")
+                        for c in rows
+                    ),
+                    timeout=timeout,
+                )
+            weave.update(status="PASS")
+        except Exception as error:
+            weave.update(status="UNVERIFIED", error_type=type(error).__name__)
+        finally:
+            try:
+                bounded_call(lambda: tracing.finish("TRACKING_CHECK_COMPLETE"), timeout=10)
+            except Exception as error:
+                weave["cleanup_error_type"] = type(error).__name__
+    return {
+        "status": "PASS" if wandb["status"] == weave["status"] == "PASS" else "DEGRADED",
+        "checked_at": time.time(),
+        "wandb": wandb,
+        "weave": weave,
+    }

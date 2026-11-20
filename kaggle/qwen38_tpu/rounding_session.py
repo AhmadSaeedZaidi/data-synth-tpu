@@ -32,7 +32,7 @@ def run(directory, source_sha256):
         deadline_seconds=1200,
         wandb_mode="online",
         wandb_project="qwen38-kaggle-tpu",
-        wandb_entity="your-wandb-entity",
+        wandb_entity="ahmadsaeedzaidi-ghulam-ishaq-khan-institute-of-engineeri",
         weave_enabled=True,
         trace_prefix="qwen38_rounding",
         local_traces=True,

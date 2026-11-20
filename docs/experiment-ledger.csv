@@ -15,7 +15,7 @@ Qwen3.8-Flash-Next,13,ERROR,2026-11-19,Application report and worker evidence
 Qwen3.8-Flash-Next,14,COMPLETE,2026-11-19,Application report and worker evidence
 Qwen3.8-Flash-Next,15,ERROR,2026-11-19,Application report and worker evidence
 Qwen3.8-Flash-Next,16,ERROR,2026-11-19,Startup report and telemetry traceback
-Qwen3.8-Flash-Next,17,UNCONFIRMED,2026-11-19,Submission and version status
+Qwen3.8-Flash-Next,17,COMPLETE,2026-11-20,Full model report and exact-version tracker
 GLM-5.3-Flash Q4/Q6,1,COMPLETE,2026-11-19,Notebook log
 GLM-5.3-Flash Q4/Q6,2,COMPLETE,2026-11-19,Notebook log
 GLM-5.3-Flash Q4/Q6,3,COMPLETE,2026-11-19,Notebook log

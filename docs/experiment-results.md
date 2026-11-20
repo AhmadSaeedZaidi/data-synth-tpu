@@ -10,10 +10,10 @@ account for **32 versions**. The shorter timeline is a selection of milestones.
 
 | Series | Saved versions | Kaggle COMPLETE | ERROR | Canceled | Unconfirmed |
 | --- | ---: | ---: | ---: | ---: | ---: |
-| Qwen3.8-Flash-Next | 17 | 6 | 7 | 3 | 1 |
+| Qwen3.8-Flash-Next | 17 | 7 | 7 | 3 | 0 |
 | GLM-5.3-Flash Q4/Q6 | 15 | 8 | 3 | 4 | 0 |
 | TPU environment, vision, runtime, and BF16 probes | 6 | 6 | 0 | 0 | 0 |
-| **TPU-series total** | **38** | **20** | **10** | **7** | **1** |
+| **TPU-series total** | **38** | **21** | **10** | **7** | **0** |
 | CPU tracking and publisher smoke tests | 2 | 2 | 0 | 0 | 0 |
 
 The unit is a saved notebook version with a version-specific Kaggle status.
@@ -24,8 +24,8 @@ physical sessions. Two predecessor GLM notebook references no longer resolve
 through the API and are outside the count. Local checks, API calls, and dataset
 revisions are also outside it.
 
-**Only two versions have comparable queue timestamps.** The **40 h 03 min**
-and **31 h 29 min** waits from v15 and v16 give the roughly **36-hour** estimate.
+**Three versions have comparable queue timestamps.** V15, v16 and v17
+waited **40 h 03 min**, **31 h 29 min** and **22 h 03 min**. We budget **36 hours**.
 Queue time and the six-hour active limit are separate. [Queue measurements](experiments.md#queue-wait)
 
 Kaggle's status describes notebook execution. The application report can
@@ -52,7 +52,7 @@ evaluation when an export error leaves Kaggle at `ERROR`.
 | v14 | COMPLETE | Profile export worked. With the updated formatting rules and configured final-answer reserve, the sequential suite scored **48/48**. B1/B2 replay passed. B4 OCR returned `STOP ?` where B1/B2 returned `STOP 7`. |
 | v15 | ERROR | Again **48/48** sequential, with the same B4 OCR error. Native Torch vision passed. A missing packed-Q6 module blocked the backend and EP/TP comparisons. An archive filename collision failed export after the JAX worker exited. |
 | v16 | ERROR | The notebook reached W&B and Weave. The W&B heartbeat appeared after the startup deadline, so the notebook exited before the TPU comparisons and model evaluation. |
-| v17 | Unconfirmed | Accepted with telemetry fallback and the full experiment bundle. The CPU probe verified Weave and observed delayed W&B sync. No TPU outcome was available at the audit. |
+| v17 | COMPLETE | **48/48** sequential, with B4 OCR drift before generation. Torch vision and eight-rank EP/TP passed. Synchronization blocked the Torch timing and BF16×6 probes. [Detailed breakdown](qwen38-v17.md) |
 
 The full sequential suite has 49 cases, including one ungraded control. Its 48
 assertions include four schema-only BeamNG reviews. Passing those four means
@@ -76,6 +76,7 @@ versions.
 | v12 | 8.09 | — | — | — | — | B1 measurement with 16K Q8 |
 | v14 | 7.99 | 8.18 | 10.18 | Skipped | — | Eight-request replay with B4 OCR failure |
 | v15 | 8.02 | 8.10 | 10.19 | Skipped | — | Eight-request replay with B4 OCR failure |
+| v17 | 8.08 | 8.30 | 10.22 | Skipped | — | Eight-request replay with teacher-forced B4 OCR diagnostics |
 
 A dash means no comparable measurement appears in the reviewed record.
 Skipped B8 replays were denied by the per-chip memory gate. The v14 gate
@@ -93,7 +94,7 @@ projected **−180 MiB** of free HBM on the tightest chip against a required
 | Packed-Q6 Pallas kernel | The CPU reference passed. The v11 TPU canary failed in Mosaic on a vector reshape, so there is no admitted TPU timing for that kernel. |
 | Explicit BF16 rounding | The standalone TPU comparison passed all **25** pairs exactly. The candidate measured **0.9986×** geometric speedup on model-width cases and kept the same collective patterns. Full-model profiles had extra rounding-related gathers that this probe did not reproduce. |
 | Static batching | Active rows averaged **56.3%** at B4 in v14 and **41.7%** at B16 in v6. Short requests leave idle rows while longer requests finish. Continuous refill and length-aware scheduling remain unmeasured. |
-| TorchTPU and BF16×6 | v15 native vision passed both frozen references on TPU. The v16 bundle passed the extracted CPU checks after the import fix. Its startup failure left Torch/JAX/hybrid speed, eight-rank EP/TP, and BF16×6 device comparisons pending. |
+| TorchTPU and BF16×6 | V17 passed native vision and both eight-rank EP/TP layouts. The Torch synchronization error prevented speed and BF16×6 results. A separate JAX Q6 projection reference mismatch is still open. |
 
 ## GLM-5.3-Flash
 

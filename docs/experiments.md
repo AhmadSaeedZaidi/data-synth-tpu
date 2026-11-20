@@ -19,9 +19,10 @@ three minutes.
 | --- | --- | --- | ---: | --- |
 | v15 | Nov 15, 09:30 | Nov 17, 01:32 | **40 h 03 min** | Full JAX results recovered after evidence export failed |
 | v16 | Nov 17, 18:59 | Nov 19, 02:27 | **31 h 29 min** | Startup stopped on W&B heartbeat readback |
+| v17 | Nov 19, 09:20 | Nov 20, 07:23 | **22 h 03 min** | Full JAX trial and partial TorchTPU evidence |
 
-Times are rounded independently to the nearest minute. The two waits average
-**35 h 46 min**. Each hardware trial has a separate six-hour active cap. The
+Times are rounded independently to the nearest minute. The three waits average
+**31 h 12 min**. We keep **36 hours** as the planning budget. Each hardware trial has a separate six-hour active cap. The
 long wait favors checking the exact upload bundle on CPU and grouping hardware
 questions into one session.
 
@@ -33,7 +34,7 @@ than the public source snapshot.
 
 | Date (2026) | Trial | Result and what changed |
 | --- | --- | --- |
-| Nov 19 | Qwen v17 · submitted | Startup now records W&B and Weave independently and can continue with local diagnostics. A CPU probe reproduced delayed W&B visibility and verified Weave. Hardware results pending at submission. |
+| Nov 20 | [Qwen v17 · evaluation completed](qwen38-v17.md) | All 48 sequential assertions passed. B4 OCR drift was visible before the first generated token. Torch vision and both eight-rank layouts passed. Torch timing and BF16×6 probes hit a synchronization error. |
 | Nov 19 | Qwen v16 · startup error | Weave received its startup trace. The W&B heartbeat was missing during the 45-second readback window and appeared after the notebook stopped. The run ended before model tests. |
 | Nov 17 | Qwen v15 · evaluation completed | 48/48 sequential assertions passed. The B4 OCR error recurred. Torch vision passed FP32/BF16 reference checks. A missing module blocked the other backend comparisons, and duplicate archive paths broke the evidence ZIP. |
 | Oct 29 | Qwen v14 · evaluation completed | 48/48 sequential assertions passed. B1/B2 passed the eight-request replay, while B4 misread one OCR case. The B8 memory gate skipped allocation. |
@@ -57,6 +58,7 @@ tokens and exclude prefill, weight loading, vision preparation, and warmup.
 | v11 · 8K Q8 trial | 8.12 | 8.36 | 9.28 | Memory gate |
 | v14 · quality-first replay | 7.99 | 8.18 | 10.18 | Memory gate |
 | v15 · quality-first replay | 8.02 | 8.10 | 10.19 | Memory gate |
+| v17 · quality-first replay | 8.08 | 8.30 | 10.22 | Memory gate |
 
 Compare rates within a trial. Prompts, token budgets, or context policies can
 differ across trials. A dash means that batch size was absent from this
@@ -66,13 +68,10 @@ schema checks. One additional control is ungraded.
 
 ## Next trial
 
-Qwen v17 was accepted on **November 19 at 09:20 UTC**, with a six-hour active
-cap. The initial API response left queue status unconfirmed. The plan compares
-built-in and explicit BF16×6 matmul, probes JAX, native TorchTPU and hybrid
-operators on matched inputs, and checks eight-rank expert/tensor parallel
-execution. The full JAX trial covers native vision, BeamNG, spatial reasoning,
-SFT formatting, and batching. A separate OCR diagnostic follows the B1 token
-history at larger batch sizes to see where predictions diverge.
+The next trial will use the public Torch synchronization API and compare
+native-highest and explicit BF16×6 on matched recurrent-state steps. The B4
+OCR investigation will compare prefill layer outputs and the vocabulary
+projection. The full JAX quality suite remains the reference.
 
 Update this log when a new trial yields evidence. Record the version, observed
 queue delay if available, experiment outcome, and a measurement or blocker

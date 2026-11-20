@@ -1,0 +1,16 @@
+# Experimental isolated TPU environment. NOT the production JAX installation.
+# Use a CPU PyTorch wheel; never pull CUDA packages onto a Kaggle TPU VM.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.12.0+cpu
+torch-tpu==0.3.0
+# Plain JAX is used for abstract StableHLO export by the hybrid bridge.
+# Do not initialize a JAX TPU client here or install jax[tpu] in this env:
+# the JAX 0.11.2 TPU extra pins libtpu 0.0.48, TorchTPU requires >=0.0.50.
+jax==0.11.2
+jaxlib==0.11.2
+libtpu==0.0.50
+numpy==2.5.3
+ml-dtypes==0.6.0
+pillow==12.3.0
+# TensorBoard's profiler path still imports pkg_resources.
+setuptools==80.9.0

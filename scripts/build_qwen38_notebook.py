@@ -74,6 +74,7 @@ def build(
     gdn_prefill="serial",
     optimization_probes=False,
     rounding_probe=False,
+    torch_comparison=False,
     quality_first=False,
 ):
     from sys import path
@@ -103,6 +104,14 @@ def build(
             files[p.relative_to(ROOT / "kaggle").as_posix()] = p.read_bytes()
     for name in SHARED:
         files["glm53_offload/" + name] = (ROOT / "kaggle/glm53_offload" / name).read_bytes()
+    if torch_comparison:
+        for p in (ROOT / "kaggle/qwen38_torch").glob("*.py"):
+            files["qwen38_torch/" + p.name] = p.read_bytes()
+        # __init__ imports layout even when the worker needs only reference.
+        # Validate this exact bundle in an isolated process before publication.
+        for name in ("__init__.py", "layout.py", "reference.py"):
+            files["packed_q6/" + name] = (ROOT / "kaggle/packed_q6" / name).read_bytes()
+        files["requirements-torchtpu.txt"] = (ROOT / "requirements-torchtpu.txt").read_bytes()
     if optimization_probes:
         files["experiments/benchmark_qwen38_kv_gather.py"] = (
             ROOT / "scripts/benchmark_qwen38_kv_gather.py"
@@ -145,11 +154,13 @@ def build(
         wandb_entity="your-wandb-entity",
         weave_enabled=True,
         trace_prefix="qwen38",
-        allow_tracking_fallback=False,
-        require_live_tracking=True,
+        allow_tracking_fallback=True,
+        require_live_tracking=False,
         local_traces=True,
         optimization_probes=optimization_probes,
         rounding_probe=rounding_probe,
+        torch_comparison=torch_comparison,
+        batch_divergence_diagnostic=torch_comparison,
         packed_q6_probe=optimization_probes,
         kv_scale_gather="indexed",
         quality_first=quality_first,
@@ -227,7 +238,8 @@ An attached full evaluation runs once before the replay benchmark, using the com
 GLM suite, eight-frame BeamNG pipeline reviews, spatial and strict SFT format tests.
 Per-chip allocator measurements gate each batch shape before allocation. Skipped shapes
 are reported and completed smaller-batch results are preserved.
-CPU/TPU golden gate and live tracking readback run before full weights are loaded. Six-
+CPU/TPU golden gates run before full weights are loaded. The notebook records startup
+readback for W&B and Weave and continues with local evidence if either is unavailable. Six-
 hour active-session watchdog. Full Q8 is rejected unless its memory plan fits.
 """,
             markdown=True,
@@ -266,6 +278,15 @@ hour active-session watchdog. Full Q8 is rejected unless its memory plan fits.
             "recorded and the baseline model trial continues after clean process shutdown. "
             "The probe does not change model quantization or inference precision. The full "
             "quality suite, expert calibration and batch benchmarks remain enabled.\n"
+        ]
+    if torch_comparison:
+        cells[0]["source"] += [
+            "\nTorchTPU investigation: use an isolated pinned environment; compare JAX, "
+            "Torch eager/compiled and hybrid packed projections and Q8 KV reads at B1/2/4/8. "
+            "Check frozen native vision and eight-rank EP/TP reductions. Install and diagnostic "
+            "work share a <=45-minute budget, reserving >=4 hours for the full model. "
+            "Experimental failures preserve results and continue after device release. "
+            "Full model inference remains JAX/Q6; no Torch policy is promoted automatically.\n"
         ]
     cells.append(
         cell(
@@ -331,7 +352,11 @@ def _save_evidence():
                      _run / 'memory.jsonl', _run / 'kv-gather.json',
                      _run / 'packed-q6.json', _run / 'optimization-preflight.json',
                      _run / 'kv-gather.log', _run / 'packed-q6.log',
-                     _run / 'rounding-probe.json', _run / 'rounding-probe.log'],
+                     _run / 'rounding-probe.json', _run / 'rounding-probe.log',
+                     _run / 'torchtpu-comparison.json',
+                     _run / 'batch-divergence.json',
+                     *sorted((_run / 'torchtpu').glob('*.json')),
+                     *sorted((_run / 'torchtpu').glob('*.log'))],
     )
 
 _dependencies = [
@@ -341,8 +366,12 @@ _dependencies = [
     'pydantic==2.13.5',
 ]
 try:
-    from glm53_offload.tracking_check import load_kaggle_key
-    load_kaggle_key()
+    from glm53_offload.tracking_check import TrackingCheckError, load_kaggle_key
+    try:
+        _credentials = load_kaggle_key()
+    except TrackingCheckError as error:
+        _credentials = {'status': 'UNAVAILABLE', 'error_type': type(error).__name__}
+        CONFIG.update(wandb_mode='disabled', weave_enabled=False)
     with (_runtime / 'dependency-setup.log').open('w') as log:
         result = subprocess.run(
             [sys.executable, '-m', 'pip', 'install', '--disable-pip-version-check', *_dependencies],
@@ -352,14 +381,20 @@ try:
     if result.returncode:
         raise RuntimeError('Dependency install failed; inspect dependency-setup.log')
     from glm53_offload.monitoring import RunMonitor
-    from glm53_offload.tracking_check import require_live_tracking
+    from glm53_offload.tracking_check import check_live_tracking
     _monitor = RunMonitor(
-        CONFIG['output_dir'], CONFIG, mode='online',
+        CONFIG['output_dir'], CONFIG, mode=CONFIG['wandb_mode'],
         project=CONFIG['wandb_project'], entity=CONFIG['wandb_entity'],
     )
-    print(bounded_call(
-        lambda: require_live_tracking(_monitor, CONFIG, CONFIG['output_dir']), timeout=150,
-    ))
+    try:
+        _tracking = bounded_call(
+            lambda: check_live_tracking(_monitor, CONFIG, _run), timeout=100,
+        )
+    except Exception as error:
+        _tracking = {'status': 'DEGRADED', 'error_type': type(error).__name__}
+    _tracking['credentials'] = _credentials
+    atomic_json(_run / 'tracking-readback.json', _tracking)
+    print('Tracking startup:', _tracking, flush=True)
 except BaseException as error:
     atomic_json(_run / 'report.json', {
         'status': 'ERROR', 'phase': 'startup', 'error_type': type(error).__name__,
@@ -380,6 +415,13 @@ _env['PYTHONUNBUFFERED'] = '1'
 _process = None
 _result = None
 try:
+    if CONFIG.get('torch_comparison', False):
+        from qwen38_torch.session import run_investigation
+        _torch = run_investigation(
+            CONFIG, _run, _monitor,
+            remaining_seconds=CONFIG['deadline_seconds'] - (time.monotonic() - _started),
+        )
+        print({'torchtpu_investigation': _torch.get('status'), 'production_enabled': False})
     if CONFIG.get('optimization_probes', False):
         from qwen38_tpu.experiments import run_optimization_probes
         print(run_optimization_probes(
@@ -426,6 +468,11 @@ finally:
     _report = finalize_report(
         _run, _result, _process.returncode if _process is not None else None,
     )
+    if CONFIG.get('torch_comparison') and (_run / 'torchtpu-comparison.json').is_file():
+        _report['torchtpu_investigation'] = json.loads(
+            (_run / 'torchtpu-comparison.json').read_text()
+        )
+        atomic_json(_run / 'report.json', _report)
     if CONFIG.get('rounding_probe') and (_run / 'rounding-probe.json').is_file():
         _report['rounding_preflight'] = json.loads((_run / 'rounding-probe.json').read_text())
         atomic_json(_run / 'report.json', _report)
@@ -505,6 +552,7 @@ def main():
         help="Include the bounded rounding comparison in the full six-hour trial",
     )
     parser.add_argument("--quality-first", action="store_true")
+    parser.add_argument("--torch-comparison", action="store_true")
     parser.add_argument("--beamng-bundle", type=Path)
     parser.add_argument("--evaluation-bundle", type=Path)
     parser.add_argument("--batch-sizes", type=int, nargs="+")
@@ -533,6 +581,7 @@ def main():
             gdn_prefill=args.gdn_prefill,
             optimization_probes=args.optimization_probes,
             rounding_probe=args.rounding_probe,
+            torch_comparison=args.torch_comparison,
             quality_first=args.quality_first,
         )
     )
